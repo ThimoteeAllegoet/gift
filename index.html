@@ -67,11 +67,13 @@
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
       padding: 40px 20px;
+      width: 100%;
     }
 
     /* ── ENVELOPE STAGE ── */
     #stage-envelope {
       display: flex; flex-direction: column; align-items: center; gap: 28px;
+      width: 100%; max-width: 500px;
     }
     .subtitle-top {
       font-family: 'Cormorant Garamond', serif;
@@ -135,7 +137,7 @@
     }
     .letter-rise p {
       font-family: 'Cormorant Garamond', serif;
-      font-size: .95rem;
+      font-size: clamp(.8rem, 2.5vw, .95rem);
       line-height: 1.55;
       color: var(--text);
     }
@@ -167,6 +169,8 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 28px rgba(220,140,160,.45);
     }
+
+    .hint {
       font-size: .78rem;
       color: var(--text-l);
       letter-spacing: .08em;
@@ -196,6 +200,7 @@
       align-items: center;
       gap: 32px;
       text-align: center;
+      width: 100%;
       max-width: 560px;
     }
     #stage-gift.visible { display: flex; }
@@ -226,52 +231,30 @@
       z-index: -1;
     }
 
-    /* ---- PLACEHOLDER image ---- */
-    .gift-img-placeholder {
-      width: 100%;
-      aspect-ratio: 4/3;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--peach) 0%, var(--lavender) 100%);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: opacity .2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .gift-img-placeholder:hover { opacity: .88; }
-    .gift-img-placeholder input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .gift-img-placeholder .upload-icon { font-size: 2.4rem; }
-    .gift-img-placeholder p { font-size: .82rem; color: var(--text-l); letter-spacing: .06em; text-transform: uppercase; }
-
-    /* real image once loaded */
+    
+    
     #gift-photo {
       width: 100%; border-radius: 12px;
-      display: none;
+      display: block;
       object-fit: cover; max-height: 380px;
     }
 
     .gift-caption {
       margin-top: 10px;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
+      font-size: clamp(.9rem, 2.5vw, 1.05rem);
       font-style: italic;
       color: var(--text-l);
-    }
-
-    /* editable caption */
-    [contenteditable="true"]:focus {
-      outline: none;
-      border-bottom: 1px dashed var(--rose-d);
+      word-break: break-word;
     }
 
     .gift-msg {
-      font-size: .92rem;
+      font-size: clamp(.82rem, 2.2vw, .92rem);
       line-height: 1.75;
       color: var(--text-l);
       max-width: 420px;
+      width: 100%;
+      word-break: break-word;
       animation: fadeUp .8s .3s ease both;
     }
 
@@ -302,21 +285,9 @@
     }
     .btn-back:hover { background: var(--rose-d); color: white; }
 
-    /* ── INSTRUCTION NOTE ── */
-    .dev-note {
-      position: fixed; bottom: 16px; right: 16px; z-index: 200;
-      background: white;
-      border: 1px solid var(--rose);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: .72rem; color: var(--text-l); line-height: 1.5;
-      max-width: 220px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.07);
-    }
-    .dev-note strong { color: var(--text); }
-    .dev-note .close-note {
-      position: absolute; top: 6px; right: 8px;
-      cursor: pointer; font-size: .8rem; color: var(--text-l);
+    /* ── FLEEING BUTTON ── */
+    .btn-reveal {
+      position: relative; /* needed for flee repositioning via JS */
     }
   </style>
 </head>
@@ -377,16 +348,27 @@
     <div class="ribbon-divider"><span>✦</span></div>
 
     <div class="gift-card">
-      <!-- placeholder upload -->
-      <div class="gift-img-placeholder" id="img-placeholder">
-        <input type="file" accept="image/*" onchange="loadImage(event)"/>
-        <span class="upload-icon">🖼️</span>
-        <p>Clique pour ajouter la photo du cadeau</p>
+      <div id="gift-img-wrapper" style="position:relative; border-radius:12px; overflow:hidden; background:#fdf0f3;">
+
+        <!-- Fausse image (cadeau nul) -->
+        <div id="gift-sock" style="opacity:1; position:relative; z-index:2;">
+          <img src="fake.png" alt="Faux cadeau" style="width:100%;border-radius:12px;display:block;"/>
+          <p style="text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:#c97890;padding: 12px 0 16px;">
+            🎁 Joyeux anniversaire… une chaussette ! 🧦<br>
+            <span style="font-size:.8rem;color:#b08898;">Poisson d'avril 🐟 — attends encore un peu…</span>
+          </p>
+        </div>
+
+        <!-- Vraie image par-dessus (cachée au départ) -->
+        <img id="gift-photo" src="gift.png" alt="Cadeau d'anniversaire"
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px;opacity:0;z-index:3;"/>
       </div>
-      <!-- real image -->
-      <img id="gift-photo" alt="Cadeau d'anniversaire"/>
-      <p class="gift-caption" contenteditable="true" title="Clique pour personnaliser">
-        ✦ Clique ici pour écrire un petit mot ✦
+
+      <p id="gift-caption-joke" class="gift-caption" style="opacity:0; transition: opacity 1s;">
+        😂 C'est tout ce que tu mérites…
+      </p>
+      <p class="gift-caption">
+        Un petit quelque chose choisi avec tout mon cœur,<br>parce que tu le mérites simplement. 🌸
       </p>
     </div>
 
@@ -400,13 +382,6 @@
 
 </div>
 
-<!-- Dev note -->
-<div class="dev-note" id="dev-note">
-  <span class="close-note" onclick="this.parentElement.remove()">✕</span>
-  <strong>Personnalise la page :</strong><br>
-  • Clique sur l'image pour ajouter ta photo<br>
-  • Clique sur la légende pour la modifier
-</div>
 
 <script>
   /* ── PETALS ── */
@@ -416,8 +391,8 @@
     p.className = 'petal';
     p.style.cssText = `
       left:${Math.random()*100}vw;
-      background:${petalColors[i%petalColors.length]};
-      animation-duration:${7+Math.random()*10}s;
+      background:${petalColors[i % petalColors.length]};
+      animation-duration:${7 + Math.random()*10}s;
       animation-delay:${Math.random()*12}s;
       transform:rotate(${Math.random()*360}deg);
     `;
@@ -426,31 +401,159 @@
 
   /* ── ENVELOPE ── */
   let opened = false;
-  function openEnvelope() {
+
+  window.openEnvelope = function() {
     if (opened) return;
     opened = true;
     const env = document.getElementById('envelope');
     env.classList.add('open');
-    // disable further hover scale while open
     env.style.pointerEvents = 'none';
 
-    // After letter rises, show the CTA button
     setTimeout(() => {
       document.getElementById('hint-text').style.display = 'none';
       const btn = document.getElementById('btn-reveal');
       btn.classList.add('show');
       btn.style.pointerEvents = 'auto';
+      startFlee();
     }, 1400);
+  };
+
+  /* ── FLEEING BUTTON 🐟 ── */
+  let fleeActive  = false;
+  let fleeCount   = 0;
+  const MAX_FLEE  = 15;
+  let lastFlee    = 0;
+
+  // Track global mouse position continuously
+  let mouseX = -999, mouseY = -999;
+  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+  function startFlee() {
+    fleeActive = true;
+    fleeCount  = 0;
+    const btn = document.getElementById('btn-reveal');
+    if (!btn) return;
+    // React the instant the cursor enters the button
+    btn.addEventListener('mouseenter', onBtnEnter);
+    btn.addEventListener('touchstart',  onBtnTouch, { passive: true });
   }
 
-  function showGift() {
+  function flee() {
+    if (!fleeActive) return;
+    const now = Date.now();
+    if (now - lastFlee < 80) return;
+    lastFlee = now;
+
+    const btn  = document.getElementById('btn-reveal');
+    const rect = btn.getBoundingClientRect();
+    const btnCX = rect.left + rect.width  / 2;
+    const btnCY = rect.top  + rect.height / 2;
+
+    if (fleeCount >= MAX_FLEE) {
+      fleeActive = false;
+      btn.removeEventListener('mouseenter', onBtnEnter);
+      btn.removeEventListener('touchstart',  onBtnTouch);
+      btn.style.transition = 'transform .3s ease';
+      btn.style.transform  = 'scale(1.1)';
+      setTimeout(() => { btn.style.transform = ''; }, 400);
+      return;
+    }
+    fleeCount++;
+
+    const isSmall  = window.innerWidth < 500;
+    const fleeDist = isSmall ? Math.min(100, window.innerWidth * 0.22) : 200;
+    const margin   = 12;
+    const edgeZone = 80; // px — si le bouton est dans cette zone d'un bord, on téléporte
+    const maxX     = window.innerWidth  - rect.width  - margin;
+    const maxY     = window.innerHeight - rect.height - margin;
+
+    const nearLeft   = rect.left < edgeZone;
+    const nearRight  = rect.right  > window.innerWidth  - edgeZone;
+    const nearTop    = rect.top    < edgeZone;
+    const nearBottom = rect.bottom > window.innerHeight - edgeZone;
+    const nearEdge   = nearLeft || nearRight || nearTop || nearBottom;
+
+    if (nearEdge) {
+      // Téléportation vers le quart opposé de l'écran
+      let attempts = 0, tpLeft, tpTop;
+      do {
+        tpLeft = margin + Math.random() * (maxX - margin);
+        tpTop  = margin + Math.random() * (maxY - margin);
+        attempts++;
+      } while (
+        (Math.hypot(tpLeft - mouseX, tpTop - mouseY) < 160 ||
+         Math.hypot(tpLeft - rect.left, tpTop - rect.top) < 120) &&
+        attempts < 30
+      );
+      btn.style.transition = 'none';
+      btn.style.left = tpLeft + 'px';
+      btn.style.top  = tpTop  + 'px';
+    } else {
+      // Fuite normale dans la direction opposée au curseur
+      const dx  = btnCX - mouseX;
+      const dy  = btnCY - mouseY;
+      const len = Math.hypot(dx, dy) || 1;
+
+      const newLeft  = rect.left + (dx / len) * fleeDist;
+      const newTop   = rect.top  + (dy / len) * fleeDist;
+      const clampedX = Math.min(Math.max(newLeft, margin), maxX);
+      const clampedY = Math.min(Math.max(newTop,  margin), maxY);
+
+      btn.style.transition = 'left .1s ease, top .1s ease';
+      btn.style.left = clampedX + 'px';
+      btn.style.top  = clampedY + 'px';
+    }
+
+    btn.style.position = 'fixed';
+    btn.style.margin   = '0';
+  }
+
+  function onBtnEnter() { flee(); }
+  function onBtnTouch(e) {
+    mouseX = e.touches[0].clientX;
+    mouseY = e.touches[0].clientY;
+    flee();
+  }
+
+  function onDocMouseMove(e) { mouseX = e.clientX; mouseY = e.clientY; }
+  function onDocTouch(e)     { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }
+
+  window.showGift = function() {
+    fleeActive = false;
+    const btn = document.getElementById('btn-reveal');
+    btn.removeEventListener('mouseenter', onBtnEnter);
+    btn.removeEventListener('touchstart',  onBtnTouch);
+
     document.getElementById('stage-envelope').style.display = 'none';
-    const g = document.getElementById('stage-gift');
-    g.classList.add('visible');
+    document.getElementById('stage-gift').classList.add('visible');
     launchConfetti();
+    startImageReveal();
+  };
+
+  /* ── SOCK → REAL IMAGE CROSSFADE ── */
+  function startImageReveal() {
+    const wrapper = document.getElementById('gift-img-wrapper');
+    const sock    = document.getElementById('gift-sock');
+    const real    = document.getElementById('gift-photo');
+    const caption = document.getElementById('gift-caption-joke');
+
+    // Show sock first, real image hidden beneath
+    sock.style.opacity  = '1';
+    real.style.opacity  = '0';
+    caption.style.opacity = '1';
+
+    // After 3s, crossfade to real image
+    setTimeout(() => {
+      caption.style.transition = 'opacity 1s';
+      caption.style.opacity = '0';
+      sock.style.transition = 'opacity 1.8s ease';
+      sock.style.opacity    = '0';
+      real.style.transition = 'opacity 1.8s ease';
+      real.style.opacity    = '1';
+    }, 3000);
   }
 
-  function goBack() {
+  window.goBack = function() {
     document.getElementById('stage-gift').classList.remove('visible');
     const stageEnv = document.getElementById('stage-envelope');
     stageEnv.style.display = '';
@@ -462,21 +565,24 @@
     document.getElementById('hint-text').style.display = '';
     const btn = document.getElementById('btn-reveal');
     btn.classList.remove('show');
-  }
-
-  /* ── IMAGE UPLOAD ── */
-  function loadImage(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = document.getElementById('gift-photo');
-      img.src = ev.target.result;
-      img.style.display = 'block';
-      document.getElementById('img-placeholder').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-  }
+    btn.style.position   = '';
+    btn.style.left       = '';
+    btn.style.top        = '';
+    btn.style.margin     = '';
+    btn.style.transition = '';
+    btn.style.transform  = '';
+    btn.removeEventListener('mouseenter', onBtnEnter);
+    btn.removeEventListener('touchstart',  onBtnTouch);
+    fleeActive = false;
+    fleeCount  = 0;
+    // Reset image reveal
+    const sock    = document.getElementById('gift-sock');
+    const real    = document.getElementById('gift-photo');
+    const caption = document.getElementById('gift-caption-joke');
+    sock.style.transition    = '';  sock.style.opacity    = '1';
+    real.style.transition    = '';  real.style.opacity    = '0';
+    caption.style.transition = '';  caption.style.opacity = '0';
+  };
 
   /* ── CONFETTI ── */
   function launchConfetti() {
@@ -492,7 +598,7 @@
       y: Math.random() * canvas.height - canvas.height,
       r: 4 + Math.random() * 5,
       d: 2 + Math.random() * 3,
-      color: colors[Math.floor(Math.random()*colors.length)],
+      color: colors[Math.floor(Math.random() * colors.length)],
       tilt: Math.random() * 10 - 5,
       tiltSpeed: .15 + Math.random() * .1,
       angle: 0,
@@ -508,7 +614,7 @@
         if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
         ctx.beginPath();
         ctx.fillStyle = p.color;
-        ctx.ellipse(p.x + p.tilt, p.y, p.r*.5, p.r, p.angle, 0, Math.PI*2);
+        ctx.ellipse(p.x + p.tilt, p.y, p.r * .5, p.r, p.angle, 0, Math.PI * 2);
         ctx.fill();
       });
       frame++;
