@@ -542,7 +542,7 @@
     real.style.opacity  = '0';
     caption.style.opacity = '1';
 
-    // After 3s, crossfade to real image
+    // After 6s, crossfade to real image
     setTimeout(() => {
       caption.style.transition = 'opacity 1s';
       caption.style.opacity = '0';
@@ -550,7 +550,7 @@
       sock.style.opacity    = '0';
       real.style.transition = 'opacity 1.8s ease';
       real.style.opacity    = '1';
-    }, 3000);
+    }, 6000);
   }
 
   window.goBack = function() {
