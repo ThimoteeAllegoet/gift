@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joyeux Anniversaire Aurélie 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:     #f2c4ce;
+      --rose-d:   #e8a0b0;
+      --peach:    #fde8d8;
+      --lavender: #e8dff5;
+      --sage:     #d4e8d8;
+      --cream:    #fdf6f0;
+      --text:     #5a4a42;
+      --text-l:   #8a7a72;
+      --gold:     #c9a96e;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── CONFETTI ── */
+    #confetti-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, #fde8d855 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, #e8dff555 0%, transparent 55%),
+        radial-gradient(ellipse at 60% 10%, #f2c4ce33 0%, transparent 45%),
+        var(--cream);
+    }
+
+    /* floating petals */
+    .petal {
+      position: fixed;
+      width: 10px; height: 14px;
+      border-radius: 50% 0 50% 0;
+      opacity: 0;
+      animation: fall linear infinite;
+      z-index: 1;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-20px) rotate(0deg);   opacity: .55; }
+      100% { transform: translateY(110vh)  rotate(360deg); opacity: 0;   }
+    }
+
+    /* ── WRAPPER ── */
+    .scene {
+      position: relative; z-index: 10;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ── ENVELOPE STAGE ── */
+    #stage-envelope {
+      display: flex; flex-direction: column; align-items: center; gap: 28px;
+    }
+    .subtitle-top {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      color: var(--text-l);
+      letter-spacing: .12em;
+      animation: fadeUp .9s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .envelope-wrap {
+      position: relative;
+      cursor: pointer;
+      animation: fadeUp .9s .25s ease both;
+      filter: drop-shadow(0 12px 32px rgba(200,150,160,.22));
+      transition: transform .3s ease, filter .3s ease;
+    }
+    .envelope-wrap:hover {
+      transform: scale(1.04);
+      filter: drop-shadow(0 18px 40px rgba(200,150,160,.35));
+    }
+
+    /* SVG envelope */
+    .env-svg { display: block; width: min(340px, 82vw); }
+
+    /* flap open animation */
+    .env-flap {
+      transform-origin: top center;
+      transform-box: fill-box;
+      transition: transform .6s cubic-bezier(.4,0,.2,1);
+    }
+    .envelope-wrap.open .env-flap {
+      transform: rotateX(180deg);
+    }
+    .env-body {
+      /* scale handled by parent */
+    }
+
+    /* letter rising */
+    .letter-rise {
+      position: absolute;
+      left: 50%; top: 18%;
+      transform: translateX(-50%) translateY(60px);
+      width: 72%;
+      background: white;
+      border-radius: 6px 6px 4px 4px;
+      padding: 18px 16px 14px;
+      box-shadow: 0 4px 24px rgba(180,120,130,.18);
+      opacity: 0;
+      transition: transform .7s .4s cubic-bezier(.34,1.56,.64,1), opacity .5s .4s;
+      text-align: center;
+      pointer-events: none;
+    }
+    .envelope-wrap.open .letter-rise {
+      transform: translateX(-50%) translateY(-38px);
+      opacity: 1;
+    }
+    .letter-rise p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .95rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .letter-rise .hearts { font-size: 1.1rem; margin-top: 6px; }
+
+    /* ── CTA button after open ── */
+    .btn-reveal {
+      font-family: 'Lato', sans-serif;
+      font-size: .8rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: white;
+      background: linear-gradient(135deg, var(--rose-d), #d4849a);
+      border: none;
+      border-radius: 40px;
+      padding: 12px 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(220,140,160,.35);
+      transition: transform .2s, box-shadow .2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .btn-reveal.show {
+      opacity: 1;
+      pointer-events: auto;
+      animation: fadeUp .6s ease both;
+    }
+    .btn-reveal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(220,140,160,.45);
+    }
+      font-size: .78rem;
+      color: var(--text-l);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      animation: fadeUp .9s .55s ease both, pulse 2.5s 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: .7; }
+      50%      { opacity: 1; }
+    }
+
+    .name-big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 10vw, 5rem);
+      font-weight: 300;
+      line-height: 1;
+      text-align: center;
+      color: var(--text);
+      animation: fadeUp .9s .1s ease both;
+    }
+    .name-big span { color: var(--rose-d); font-style: italic; }
+
+    /* ── GIFT STAGE ── */
+    #stage-gift {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      text-align: center;
+      max-width: 560px;
+    }
+    #stage-gift.visible { display: flex; }
+
+    .gift-header {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      font-weight: 300;
+      color: var(--text);
+      animation: fadeUp .8s ease both;
+    }
+    .gift-header em { color: var(--rose-d); font-style: italic; }
+
+    .gift-card {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 16px 48px rgba(200,150,160,.2), 0 2px 8px rgba(200,150,160,.12);
+      padding: 16px;
+      animation: fadeUp .8s .15s ease both;
+      width: 100%;
+    }
+    .gift-card::before {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--rose), var(--lavender), var(--peach));
+      z-index: -1;
+    }
+
+    /* ---- PLACEHOLDER image ---- */
+    .gift-img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--peach) 0%, var(--lavender) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: opacity .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .gift-img-placeholder:hover { opacity: .88; }
+    .gift-img-placeholder input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .gift-img-placeholder .upload-icon { font-size: 2.4rem; }
+    .gift-img-placeholder p { font-size: .82rem; color: var(--text-l); letter-spacing: .06em; text-transform: uppercase; }
+
+    /* real image once loaded */
+    #gift-photo {
+      width: 100%; border-radius: 12px;
+      display: none;
+      object-fit: cover; max-height: 380px;
+    }
+
+    .gift-caption {
+      margin-top: 10px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-l);
+    }
+
+    /* editable caption */
+    [contenteditable="true"]:focus {
+      outline: none;
+      border-bottom: 1px dashed var(--rose-d);
+    }
+
+    .gift-msg {
+      font-size: .92rem;
+      line-height: 1.75;
+      color: var(--text-l);
+      max-width: 420px;
+      animation: fadeUp .8s .3s ease both;
+    }
+
+    /* ── RIBBON decoration ── */
+    .ribbon-divider {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%;
+      animation: fadeUp .8s .4s ease both;
+    }
+    .ribbon-divider::before, .ribbon-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, var(--rose-d), transparent);
+    }
+    .ribbon-divider span { color: var(--rose-d); font-size: .85rem; letter-spacing: .2em; }
+
+    /* ── BACK BUTTON ── */
+    .btn-back {
+      font-family: 'Lato', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-l);
+      background: none; border: 1px solid var(--rose-d);
+      border-radius: 40px; padding: 8px 22px;
+      cursor: pointer;
+      transition: background .25s, color .25s;
+      animation: fadeUp .8s .5s ease both;
+    }
+    .btn-back:hover { background: var(--rose-d); color: white; }
+
+    /* ── INSTRUCTION NOTE ── */
+    .dev-note {
+      position: fixed; bottom: 16px; right: 16px; z-index: 200;
+      background: white;
+      border: 1px solid var(--rose);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: .72rem; color: var(--text-l); line-height: 1.5;
+      max-width: 220px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.07);
+    }
+    .dev-note strong { color: var(--text); }
+    .dev-note .close-note {
+      position: absolute; top: 6px; right: 8px;
+      cursor: pointer; font-size: .8rem; color: var(--text-l);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div class="bg"></div>
+
+<!-- Floating petals (created by JS) -->
+
+<div class="scene">
+
+  <!-- ══ STAGE 1 : ENVELOPE ══ -->
+  <div id="stage-envelope">
+    <p class="subtitle-top">✦ Une surprise t'attend ✦</p>
+
+    <h1 class="name-big">Joyeux anniversaire<br><span>Aurélie</span></h1>
+
+    <div class="envelope-wrap" id="envelope" onclick="openEnvelope()">
+      <!-- SVG Envelope -->
+      <svg class="env-svg" viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
+        <!-- shadow -->
+        <ellipse cx="170" cy="222" rx="120" ry="8" fill="rgba(200,140,150,.15)"/>
+        <!-- body -->
+        <g class="env-body">
+          <rect x="10" y="70" width="320" height="155" rx="12" ry="12" fill="#fff5f8" stroke="#f2c4ce" stroke-width="1.5"/>
+          <!-- bottom left triangle -->
+          <polygon points="10,225 170,140 10,70" fill="#fde8d8" stroke="#f2c4ce" stroke-width="1"/>
+          <!-- bottom right triangle -->
+          <polygon points="330,225 170,140 330,70" fill="#fde8d8" stroke="#f2c4ce" stroke-width="1"/>
+          <!-- bottom fold -->
+          <polygon points="10,225 330,225 170,140" fill="#fdf0f3" stroke="#f2c4ce" stroke-width="1"/>
+          <!-- wax seal -->
+          <circle cx="170" cy="168" r="22" fill="#f2c4ce" stroke="#e8a0b0" stroke-width="1"/>
+          <text x="170" y="173" text-anchor="middle" font-size="18" fill="#c97890">✿</text>
+        </g>
+        <!-- flap (animatable) -->
+        <g class="env-flap">
+          <polygon points="10,70 330,70 170,158" fill="#fce4ec" stroke="#f2c4ce" stroke-width="1.5"/>
+        </g>
+      </svg>
+
+      <!-- mini letter that rises -->
+      <div class="letter-rise">
+        <p>Pour toi, avec tout mon amour…<br>Clique pour découvrir ton cadeau 🌸</p>
+        <div class="hearts">♡ ♡ ♡</div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint-text">Clique sur l'enveloppe</p>
+    <button class="btn-reveal" id="btn-reveal" onclick="showGift()">Découvrir mon cadeau →</button>
+  </div>
+
+  <!-- ══ STAGE 2 : GIFT ══ -->
+  <div id="stage-gift">
+    <div class="gift-header">Ton cadeau, <em>mon amour</em> 🎁</div>
+
+    <div class="ribbon-divider"><span>✦</span></div>
+
+    <div class="gift-card">
+      <!-- placeholder upload -->
+      <div class="gift-img-placeholder" id="img-placeholder">
+        <input type="file" accept="image/*" onchange="loadImage(event)"/>
+        <span class="upload-icon">🖼️</span>
+        <p>Clique pour ajouter la photo du cadeau</p>
+      </div>
+      <!-- real image -->
+      <img id="gift-photo" alt="Cadeau d'anniversaire"/>
+      <p class="gift-caption" contenteditable="true" title="Clique pour personnaliser">
+        ✦ Clique ici pour écrire un petit mot ✦
+      </p>
+    </div>
+
+    <p class="gift-msg">
+      Parce que tu mérites le meilleur chaque jour,<br>
+      et encore plus en ce jour si spécial. 🌸
+    </p>
+
+    <button class="btn-back" onclick="goBack()">← Revenir à l'enveloppe</button>
+  </div>
+
+</div>
+
+<!-- Dev note -->
+<div class="dev-note" id="dev-note">
+  <span class="close-note" onclick="this.parentElement.remove()">✕</span>
+  <strong>Personnalise la page :</strong><br>
+  • Clique sur l'image pour ajouter ta photo<br>
+  • Clique sur la légende pour la modifier
+</div>
+
+<script>
+  /* ── PETALS ── */
+  const petalColors = ['#f2c4ce','#fde8d8','#e8dff5','#d4e8d8','#fce4ec'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.cssText = `
+      left:${Math.random()*100}vw;
+      background:${petalColors[i%petalColors.length]};
+      animation-duration:${7+Math.random()*10}s;
+      animation-delay:${Math.random()*12}s;
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    document.body.appendChild(p);
+  }
+
+  /* ── ENVELOPE ── */
+  let opened = false;
+  function openEnvelope() {
+    if (opened) return;
+    opened = true;
+    const env = document.getElementById('envelope');
+    env.classList.add('open');
+    // disable further hover scale while open
+    env.style.pointerEvents = 'none';
+
+    // After letter rises, show the CTA button
+    setTimeout(() => {
+      document.getElementById('hint-text').style.display = 'none';
+      const btn = document.getElementById('btn-reveal');
+      btn.classList.add('show');
+      btn.style.pointerEvents = 'auto';
+    }, 1400);
+  }
+
+  function showGift() {
+    document.getElementById('stage-envelope').style.display = 'none';
+    const g = document.getElementById('stage-gift');
+    g.classList.add('visible');
+    launchConfetti();
+  }
+
+  function goBack() {
+    document.getElementById('stage-gift').classList.remove('visible');
+    const stageEnv = document.getElementById('stage-envelope');
+    stageEnv.style.display = '';
+    stageEnv.style.animation = '';
+    opened = false;
+    const env = document.getElementById('envelope');
+    env.classList.remove('open');
+    env.style.pointerEvents = '';
+    document.getElementById('hint-text').style.display = '';
+    const btn = document.getElementById('btn-reveal');
+    btn.classList.remove('show');
+  }
+
+  /* ── IMAGE UPLOAD ── */
+  function loadImage(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('gift-photo');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+      document.getElementById('img-placeholder').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── CONFETTI ── */
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.style.opacity = 1;
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#f2c4ce','#fde8d8','#e8dff5','#d4e8d8','#c9a96e','#fce4ec'];
+    const pieces = Array.from({length: 120}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: 4 + Math.random() * 5,
+      d: 2 + Math.random() * 3,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      tilt: Math.random() * 10 - 5,
+      tiltSpeed: .15 + Math.random() * .1,
+      angle: 0,
+    }));
+
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.angle += p.tiltSpeed;
+        p.tilt = Math.sin(p.angle) * 12;
+        p.y += p.d;
+        if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.ellipse(p.x + p.tilt, p.y, p.r*.5, p.r, p.angle, 0, Math.PI*2);
+        ctx.fill();
+      });
+      frame++;
+      if (frame < 260) requestAnimationFrame(draw);
+      else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.opacity = 0;
+      }
+    }
+    draw();
+  }
+
+  window.addEventListener('resize', () => {
+    const c = document.getElementById('confetti-canvas');
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
