@@ -383,15 +383,23 @@
       <p id="gift-caption-joke" class="gift-caption" style="opacity:0; transition: opacity 1s;">
         😂 C'est tout ce que tu mérites…
       </p>
-      <p class="gift-caption">
-        Un petit quelque chose choisi avec tout mon cœur,<br>parce que tu le mérites simplement. 🌸
+      <p id="gift-caption-real" class="gift-caption" style="opacity:0; transition: opacity 1.8s;">
+        🌿 Weekend Spa en amoureux — nuit à l'hôtel<br>le 9 mai 💑
       </p>
     </div>
 
-    <p class="gift-msg">
-      Parce que tu mérites le meilleur chaque jour,<br>
-      et encore plus en ce jour si spécial. 🌸
+    <p id="gift-msg-real" class="gift-msg" style="opacity:0; transition: opacity 1.8s;">
+      Parce que tu mérites de souffler, de te détendre,<br>
+      et de profiter d'un moment rien que pour nous. 🌸
     </p>
+
+    <a id="btn-spa" href="https://www.rivieraaixlesbains.com/" target="_blank"
+       style="opacity:0; transition: opacity 1.8s; text-decoration:none;
+              font-family:'Lato',sans-serif; font-size:.75rem; letter-spacing:.14em;
+              text-transform:uppercase; color:var(--text-l); border:1px solid var(--rose-d);
+              border-radius:40px; padding:8px 22px; display:inline-block;">
+      Voir le Spa →
+    </a>
 
     <button class="btn-back" onclick="goBack()">← Revenir à l'enveloppe</button>
   </div>
@@ -566,6 +574,10 @@
       sock.style.opacity    = '0';
       real.style.transition = 'opacity 1.8s ease';
       real.style.opacity    = '1';
+      // Reveal real message and spa button
+      document.getElementById('gift-caption-real').style.opacity = '1';
+      document.getElementById('gift-msg-real').style.opacity     = '1';
+      document.getElementById('btn-spa').style.opacity           = '1';
     }, 6000);
   }
 
@@ -598,6 +610,12 @@
     sock.style.transition    = '';  sock.style.opacity    = '1';
     real.style.transition    = '';  real.style.opacity    = '0';
     caption.style.transition = '';  caption.style.opacity = '0';
+    document.getElementById('gift-caption-real').style.transition = '';
+    document.getElementById('gift-caption-real').style.opacity    = '0';
+    document.getElementById('gift-msg-real').style.transition     = '';
+    document.getElementById('gift-msg-real').style.opacity        = '0';
+    document.getElementById('btn-spa').style.transition           = '';
+    document.getElementById('btn-spa').style.opacity              = '0';
   };
 
   /* ── CONFETTI ── */
