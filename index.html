@@ -378,6 +378,18 @@
         <!-- Vraie image par-dessus (cachée au départ) -->
         <img id="gift-photo" src="gift.png" alt="Cadeau d'anniversaire"
              style="position:absolute;inset:0;opacity:0;z-index:3;"/>
+
+        <!-- Bouton Spa sur l'image -->
+        <a id="btn-spa" href="https://www.rivieraaixlesbains.com/" target="_blank"
+           style="opacity:0; transition: opacity 1.8s; z-index:4;
+                  position:absolute; bottom:14px; right:14px;
+                  text-decoration:none; font-family:'Lato',sans-serif;
+                  font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+                  color:white; background:rgba(0,0,0,.32); backdrop-filter:blur(6px);
+                  border:1px solid rgba(255,255,255,.4); border-radius:40px;
+                  padding:7px 16px;">
+          Voir le Spa →
+        </a>
       </div>
 
       <p id="gift-caption-joke" class="gift-caption" style="opacity:0; transition: opacity 1s;">
@@ -392,16 +404,6 @@
       Parce que tu mérites de souffler, de te détendre,<br>
       et de profiter d'un moment rien que pour nous. 🌸
     </p>
-
-    <a id="btn-spa" href="https://www.rivieraaixlesbains.com/" target="_blank"
-       style="opacity:0; transition: opacity 1.8s; text-decoration:none;
-              font-family:'Lato',sans-serif; font-size:.75rem; letter-spacing:.14em;
-              text-transform:uppercase; color:var(--text-l); border:1px solid var(--rose-d);
-              border-radius:40px; padding:8px 22px; display:inline-block;">
-      Voir le Spa →
-    </a>
-
-    <button class="btn-back" onclick="goBack()">← Revenir à l'enveloppe</button>
   </div>
 
 </div>
